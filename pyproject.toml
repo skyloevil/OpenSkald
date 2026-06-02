@@ -1,7 +1,7 @@
 [project]
-name = "openskald-content-agent"
+name = "openviking-content-agent"
 version = "0.1.0"
-description = "Self-hosted AI content automation platform for OpenSkald knowledge bases."
+description = "Self-hosted AI content automation platform for OpenViking knowledge bases."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -22,7 +22,7 @@ dev = [
 ]
 
 [project.scripts]
-openskald = "backend.app.cli:main"
+openviking-agent = "backend.app.cli:main"
 
 [tool.uv]
 package = false

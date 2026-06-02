@@ -79,7 +79,7 @@ class DemoLLMProvider(LLMProvider):
             return (
                 "# Demo Technical Brief\n\n"
                 "## Executive Summary\n\n"
-                "This demo article shows how OpenSkald Content Agent turns a local knowledge "
+                "This demo article shows how OpenViking Content Agent turns a local knowledge "
                 "base into reviewable long-form technical content. It preserves source context, "
                 "keeps claims grounded, and gives the reviewer a clear draft before publishing.\n\n"
                 "## Technical Context\n\n"

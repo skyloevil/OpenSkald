@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from backend.app.domain.models import ContentType, GeneratedContent, SkillProposal
-from backend.app.knowledge.openskald import OpenSkaldKnowledgeBase
+from backend.app.knowledge.openviking import OpenVikingKnowledgeBase
 from backend.app.llm.provider import LLMProvider
 from backend.app.memory.store import MemoryStore
 from backend.app.skills.base import SkillRegistry
@@ -10,7 +10,7 @@ from backend.app.skills.base import SkillRegistry
 class ContentAgent:
     def __init__(
         self,
-        knowledge_base: OpenSkaldKnowledgeBase,
+        knowledge_base: OpenVikingKnowledgeBase,
         skills: SkillRegistry,
         llm: LLMProvider,
         memory: MemoryStore,
@@ -29,9 +29,9 @@ class ContentAgent:
         article_source = "index"
         if not articles:
             articles = self.knowledge_base.recent_articles()
-            article_source = "openskald"
+            article_source = "openviking"
         if not articles:
-            raise ValueError("No OpenSkald articles available for generation")
+            raise ValueError("No OpenViking articles available for generation")
         generated: list[GeneratedContent] = []
         for platform in platforms:
             skills = self.skills.for_content(content_type, platform)

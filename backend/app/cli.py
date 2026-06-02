@@ -12,11 +12,11 @@ from backend.app.ops.status import operational_status
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="openskald")
+    parser = argparse.ArgumentParser(prog="openviking-agent")
     parser.add_argument(
         "--config",
         default=None,
-        help="Path to config.yaml. Defaults to OPENSKALD_AGENT_CONFIG or config/config.yaml.",
+        help="Path to config.yaml. Defaults to OPENVIKING_AGENT_CONFIG or config/config.yaml.",
     )
     subcommands = parser.add_subparsers(dest="command", required=True)
 
@@ -32,7 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     generate.add_argument("--platform", action="append", required=True, dest="platforms")
 
-    subcommands.add_parser("knowledge-ingest", help="Ingest OpenSkald articles into memory.")
+    subcommands.add_parser("knowledge-ingest", help="Ingest OpenViking articles into memory.")
 
     articles = subcommands.add_parser("knowledge-list", help="List ingested articles.")
     articles.add_argument("--query", default=None)

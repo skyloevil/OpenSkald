@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from backend.app.knowledge.openskald import OpenSkaldKnowledgeBase
+from backend.app.knowledge.openviking import OpenVikingKnowledgeBase
 from backend.app.memory.store import MemoryStore
 
 
 class KnowledgeIngestionAgent:
-    def __init__(self, knowledge_base: OpenSkaldKnowledgeBase, memory: MemoryStore) -> None:
+    def __init__(self, knowledge_base: OpenVikingKnowledgeBase, memory: MemoryStore) -> None:
         self.knowledge_base = knowledge_base
         self.memory = memory
 

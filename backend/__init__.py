@@ -1,1 +1,1 @@
-"""Backend package for OpenSkald Content Agent."""
+"""Backend package for OpenViking Content Agent."""

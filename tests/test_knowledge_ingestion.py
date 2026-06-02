@@ -1,9 +1,9 @@
 from pathlib import Path
 
 from backend.app.agents.knowledge_ingestion_agent import KnowledgeIngestionAgent
-from backend.app.config.settings import OpenSkaldConfig
+from backend.app.config.settings import OpenVikingConfig
 from backend.app.domain.models import Article, ContentType, ReviewStatus, SkillProposal
-from backend.app.knowledge.openskald import OpenSkaldKnowledgeBase
+from backend.app.knowledge.openviking import OpenVikingKnowledgeBase
 from backend.app.memory.store import MemoryStore
 
 
@@ -28,7 +28,7 @@ Memory makes publishing workflows reusable.
         tmp_path / "articles.jsonl",
     )
     agent = KnowledgeIngestionAgent(
-        OpenSkaldKnowledgeBase(OpenSkaldConfig(knowledge_base_path=article.parent)),
+        OpenVikingKnowledgeBase(OpenVikingConfig(knowledge_base_path=article.parent)),
         memory,
     )
 

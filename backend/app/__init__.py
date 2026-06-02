@@ -1,1 +1,1 @@
-"""OpenSkald Content Agent application package."""
+"""OpenViking Content Agent application package."""

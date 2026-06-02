@@ -195,7 +195,7 @@ async def test_x_publisher_check_uses_user_access_token(monkeypatch: pytest.Monk
         auth_log.append(kwargs["headers"].get("Authorization"))
         return httpx.Response(
             200,
-            json={"data": {"id": "u_123", "username": "openskald", "name": "OpenSkald"}},
+            json={"data": {"id": "u_123", "username": "openviking", "name": "OpenViking"}},
         )
 
     monkeypatch.setattr(httpx.AsyncClient, "get", mock_get)
@@ -208,7 +208,7 @@ async def test_x_publisher_check_uses_user_access_token(monkeypatch: pytest.Monk
     result = await publisher.check()
 
     assert result["ok"] is True
-    assert result["username"] == "openskald"
+    assert result["username"] == "openviking"
     assert call_log == ["https://api.x.com/2/users/me"]
     assert auth_log == ["Bearer check_token"]
 

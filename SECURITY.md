@@ -1,6 +1,6 @@
 # Security Policy
 
-OpenSkald Content Agent handles LLM and publishing credentials through environment
+OpenViking Content Agent handles LLM and publishing credentials through environment
 variables only. Do not commit secrets, cookies, access tokens, or private account IDs.
 
 ## Supported Versions

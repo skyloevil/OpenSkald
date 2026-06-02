@@ -17,7 +17,7 @@ llm:
   base_url: http://localhost:3456/v1
   api_key_env: TEST_KEY
   model: test-model
-openskald:
+openviking:
   knowledge_base_path: {knowledge}
 publishers:
   x:
@@ -85,7 +85,7 @@ def test_cli_generate_once_fails_without_articles(tmp_path: Path, capsys) -> Non
 
     output = capsys.readouterr().out
     assert exit_code == 1
-    assert "No OpenSkald articles" in output
+    assert "No OpenViking articles" in output
 
 
 def test_cli_review_list_reads_memory(tmp_path: Path, capsys) -> None:
@@ -290,7 +290,7 @@ log_level: INFO
 llm:
   provider: demo
   model: demo-local-deterministic
-openskald:
+openviking:
   knowledge_base_path: {knowledge}
 publishers:
   x:

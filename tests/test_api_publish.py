@@ -19,7 +19,7 @@ log_level: INFO
 llm:
   provider: demo
   model: demo-local-deterministic
-openskald:
+openviking:
   knowledge_base_path: {knowledge_path}
 publishers:
   x:
@@ -97,7 +97,7 @@ def test_api_generate_fails_without_articles(tmp_path: Path) -> None:
         )
 
     assert response.status_code == 409
-    assert "No OpenSkald articles" in response.json()["detail"]
+    assert "No OpenViking articles" in response.json()["detail"]
 
 
 def test_api_content_summary_and_failures(tmp_path: Path) -> None:
@@ -146,14 +146,14 @@ def test_api_memory_timeline_and_search(tmp_path: Path) -> None:
 
 def test_api_knowledge_ingest_and_search(tmp_path: Path) -> None:
     config_path = _write_config(tmp_path)
-    knowledge_file = tmp_path / "knowledge" / "openskald.md"
+    knowledge_file = tmp_path / "knowledge" / "openviking.md"
     knowledge_file.write_text(
         """---
-title: OpenSkald Memory
+title: OpenViking Memory
 tags:
   - memory
 ---
-# OpenSkald Memory
+# OpenViking Memory
 
 Local notes can feed publishing automation.
 """,
@@ -168,7 +168,7 @@ Local notes can feed publishing automation.
     assert ingest.status_code == 200
     assert ingest.json()["ingested"] == 1
     assert articles.status_code == 200
-    assert articles.json()[0]["title"] == "OpenSkald Memory"
+    assert articles.json()[0]["title"] == "OpenViking Memory"
 
 
 def test_api_skill_discovery_from_memory(tmp_path: Path) -> None:

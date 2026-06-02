@@ -183,7 +183,7 @@ wheels = [
 ]
 
 [[package]]
-name = "openskald-content-agent"
+name = "openviking-content-agent"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

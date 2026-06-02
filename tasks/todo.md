@@ -1,4 +1,4 @@
-# OpenSkald Content Agent - Development Plan
+# OpenViking Content Agent - Development Plan
 
 ## Current State
 
@@ -6,7 +6,7 @@ The project has a solid V1 foundation already implemented:
 - ✅ Clean Architecture with plugin-based skills and publishers
 - ✅ Configuration-driven (config.yaml)
 - ✅ LLMProvider with OpenAI-compatible + Demo providers
-- ✅ OpenSkald knowledge base adapter
+- ✅ OpenViking knowledge base adapter
 - ✅ 5 declarative skills (article_summary, tech_analysis, wechat_writer, x_writer, xiaohongshu_writer)
 - ✅ 3 publisher plugins (wechat, x, xiaohongshu) with dry-run + validation
 - ✅ Content generation, review, and publishing agents
@@ -14,7 +14,7 @@ The project has a solid V1 foundation already implemented:
 - ✅ Memory store (JSONL-based)
 - ✅ Scheduler (APScheduler cron jobs)
 - ✅ FastAPI REST API with full CRUD routes
-- ✅ CLI (openskald)
+- ✅ CLI (openviking-agent)
 - ✅ Docker + docker-compose
 - ✅ Demo mode
 - ✅ 12 test files

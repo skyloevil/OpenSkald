@@ -40,7 +40,7 @@ log_level: INFO
 llm:
   provider: demo
   model: demo-local-deterministic
-openskald:
+openviking:
   knowledge_base_path: {tmp_knowledge}
 publishers:
   blog:

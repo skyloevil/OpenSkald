@@ -28,7 +28,7 @@ def create_app(config_path: str | None = None) -> FastAPI:
         level=getattr(logging, container.config.log_level.upper(), logging.INFO),
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
-    app = FastAPI(title="OpenSkald Content Agent", version="0.1.0", lifespan=lifespan)
+    app = FastAPI(title="OpenViking Content Agent", version="0.1.0", lifespan=lifespan)
     app.state.container = container
     app.include_router(build_router(container), prefix="/api")
     return app

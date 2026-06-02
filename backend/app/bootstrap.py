@@ -11,7 +11,7 @@ from backend.app.agents.publishing_agent import PublishingAgent
 from backend.app.agents.skill_evolution_agent import SkillEvolutionAgent
 from backend.app.config.settings import AppConfig, ConfigIssue, load_config, validate_config
 from backend.app.domain.models import GeneratedContent
-from backend.app.knowledge.openskald import OpenSkaldKnowledgeBase
+from backend.app.knowledge.openviking import OpenVikingKnowledgeBase
 from backend.app.llm.provider import build_llm_provider
 from backend.app.memory.store import MemoryStore
 from backend.app.publishers.base import PublisherRegistry
@@ -22,7 +22,7 @@ from backend.app.skills.base import SkillRegistry
 @dataclass
 class AppContainer:
     config: AppConfig
-    knowledge_base: OpenSkaldKnowledgeBase
+    knowledge_base: OpenVikingKnowledgeBase
     skills: SkillRegistry
     publishers: PublisherRegistry
     memory: MemoryStore
@@ -43,7 +43,7 @@ class AppContainer:
 def build_container(config_path: str | None = None) -> AppContainer:
     config = load_config(config_path)
     config_issues = validate_config(config)
-    knowledge_base = OpenSkaldKnowledgeBase(config.openskald)
+    knowledge_base = OpenVikingKnowledgeBase(config.openviking)
     skills = SkillRegistry(Path("backend/app/skills"))
     skills.load()
     publishers = PublisherRegistry(config.publishers)
