@@ -14,7 +14,7 @@ The project has a solid V1 foundation already implemented:
 - ✅ Memory store (JSONL-based)
 - ✅ Scheduler (APScheduler cron jobs)
 - ✅ FastAPI REST API with full CRUD routes
-- ✅ CLI (openviking-agent)
+- ✅ CLI (OpenSkald)
 - ✅ Docker + docker-compose
 - ✅ Demo mode
 - ✅ 12 test files

@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from backend.app.config.settings import config_summary, load_config, validate_config
 from backend.app.domain.models import ContentType
 
@@ -25,6 +27,21 @@ publishers:
 
     assert config.llm.model == "test-model"
     assert config.publishers["x"].dry_run is True
+
+
+def test_load_config_raises_for_explicit_missing_path(tmp_path: Path) -> None:
+    missing_path = tmp_path / "missing.yaml"
+
+    with pytest.raises(FileNotFoundError, match="Configuration file not found"):
+        load_config(missing_path)
+
+
+def test_load_config_raises_for_missing_env_path(tmp_path: Path, monkeypatch) -> None:
+    missing_path = tmp_path / "missing-env.yaml"
+    monkeypatch.setenv("OPENVIKING_AGENT_CONFIG", str(missing_path))
+
+    with pytest.raises(FileNotFoundError, match="Configuration file not found"):
+        load_config()
 
 
 def test_config_summary_redacts_secret_values(tmp_path: Path, monkeypatch) -> None:
@@ -75,6 +92,19 @@ review:
 
     assert any(issue.level == "error" for issue in issues)
     assert any("human approval" in issue.message for issue in issues)
+
+
+def test_validate_config_rejects_current_directory_knowledge_path() -> None:
+    config = load_config("config/config.yaml")
+    config.openviking.knowledge_base_path = Path(".")
+
+    issues = validate_config(config)
+
+    assert any(
+        issue.level == "error"
+        and "cannot be empty or point to the current directory" in issue.message
+        for issue in issues
+    )
 
 
 def test_validate_config_requires_enabled_publisher_credentials(tmp_path: Path) -> None:

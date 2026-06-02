@@ -120,7 +120,7 @@ docker compose up --build
 ```
 
 Mount your OpenViking export or vault at `./knowledge`.
-The container runs `openviking-agent validate-config` before starting the API and exposes
+The container runs `OpenSkald validate-config` before starting the API and exposes
 a Docker healthcheck at `/api/health`.
 
 ## Configuration
@@ -163,27 +163,27 @@ of creating empty drafts.
 The CLI uses the same services as the FastAPI app and prints JSON for automation:
 
 ```bash
-uv run openviking-agent --config config/local.yaml validate-config
-uv run openviking-agent --config config/local.yaml config-summary
-uv run openviking-agent --config config/local.yaml status
-uv run openviking-agent --config config/local.yaml knowledge-ingest
-uv run openviking-agent --config config/local.yaml generate-once \
+uv run OpenSkald --config config/local.yaml validate-config
+uv run OpenSkald --config config/local.yaml config-summary
+uv run OpenSkald --config config/local.yaml status
+uv run OpenSkald --config config/local.yaml knowledge-ingest
+uv run OpenSkald --config config/local.yaml generate-once \
   --content-type daily_summary \
   --platform blog \
   --platform x \
   --platform wechat
-uv run openviking-agent --config config/local.yaml knowledge-list --query rag
-uv run openviking-agent --config config/local.yaml review-list --status pending_review
-uv run openviking-agent --config config/local.yaml content-summary
-uv run openviking-agent --config config/local.yaml content-failures
-uv run openviking-agent --config config/local.yaml memory-timeline --limit 10
-uv run openviking-agent --config config/local.yaml memory-search --query retrieval
-uv run openviking-agent --config config/local.yaml skills-discover
-uv run openviking-agent --config config/local.yaml review-approve --content-id <content_id>
-uv run openviking-agent --config config/local.yaml publisher-check --platform x
-uv run openviking-agent --config config/local.yaml publisher-check-all
-uv run openviking-agent --config config/local.yaml publish-content --content-id <content_id>
-uv run openviking-agent --config config/local.yaml publish-approved --platform x
+uv run OpenSkald --config config/local.yaml knowledge-list --query rag
+uv run OpenSkald --config config/local.yaml review-list --status pending_review
+uv run OpenSkald --config config/local.yaml content-summary
+uv run OpenSkald --config config/local.yaml content-failures
+uv run OpenSkald --config config/local.yaml memory-timeline --limit 10
+uv run OpenSkald --config config/local.yaml memory-search --query retrieval
+uv run OpenSkald --config config/local.yaml skills-discover
+uv run OpenSkald --config config/local.yaml review-approve --content-id <content_id>
+uv run OpenSkald --config config/local.yaml publisher-check --platform x
+uv run OpenSkald --config config/local.yaml publisher-check-all
+uv run OpenSkald --config config/local.yaml publish-content --content-id <content_id>
+uv run OpenSkald --config config/local.yaml publish-approved --platform x
 ```
 
 If publishing fails, the content remains `approved` and the error is stored in
@@ -193,9 +193,9 @@ If publishing fails, the content remains `approved` and the error is stored in
 Failure inspection:
 
 ```bash
-uv run openviking-agent --config config/local.yaml status
-uv run openviking-agent --config config/local.yaml content-summary
-uv run openviking-agent --config config/local.yaml content-failures --platform x
+uv run OpenSkald --config config/local.yaml status
+uv run OpenSkald --config config/local.yaml content-summary
+uv run OpenSkald --config config/local.yaml content-failures --platform x
 curl http://localhost:8000/api/status
 curl http://localhost:8000/api/content/summary
 curl "http://localhost:8000/api/content/failures?platform=x"
@@ -204,12 +204,12 @@ curl "http://localhost:8000/api/content/failures?platform=x"
 Memory inspection:
 
 ```bash
-uv run openviking-agent --config config/local.yaml knowledge-ingest
-uv run openviking-agent --config config/local.yaml knowledge-list --query "openviking"
+uv run OpenSkald --config config/local.yaml knowledge-ingest
+uv run OpenSkald --config config/local.yaml knowledge-list --query "openviking"
 curl -X POST http://localhost:8000/api/knowledge/ingest
 curl "http://localhost:8000/api/knowledge/search?q=openviking"
-uv run openviking-agent --config config/local.yaml memory-timeline --platform x
-uv run openviking-agent --config config/local.yaml memory-search --query "review edit"
+uv run OpenSkald --config config/local.yaml memory-timeline --platform x
+uv run OpenSkald --config config/local.yaml memory-search --query "review edit"
 curl "http://localhost:8000/api/memory/timeline?platform=x&limit=10"
 curl "http://localhost:8000/api/memory/search?q=review%20edit"
 ```
@@ -244,7 +244,7 @@ Generated skill drafts are written with `enabled: false`; they are never auto-ex
 The agent can also discover proposals from memory:
 
 ```bash
-uv run openviking-agent --config config/local.yaml skills-discover
+uv run OpenSkald --config config/local.yaml skills-discover
 curl -X POST http://localhost:8000/api/skills/proposals/discover
 ```
 
@@ -285,16 +285,16 @@ X live-send checklist:
 ```bash
 export X_PUBLISHER_CREDENTIALS='{"user_access_token":"YOUR_USER_ACCESS_TOKEN"}'
 
-uv run openviking-agent --config config/config.yaml validate-config
-uv run openviking-agent --config config/config.yaml publisher-check --platform x
-uv run openviking-agent --config config/config.yaml generate-once \
+uv run OpenSkald --config config/config.yaml validate-config
+uv run OpenSkald --config config/config.yaml publisher-check --platform x
+uv run OpenSkald --config config/config.yaml generate-once \
   --content-type daily_summary \
   --platform x
-uv run openviking-agent --config config/config.yaml review-list \
+uv run OpenSkald --config config/config.yaml review-list \
   --status pending_review \
   --platform x
-uv run openviking-agent --config config/config.yaml review-approve --content-id <content_id>
-uv run openviking-agent --config config/config.yaml publish-content --content-id <content_id>
+uv run OpenSkald --config config/config.yaml review-approve --content-id <content_id>
+uv run OpenSkald --config config/config.yaml publish-content --content-id <content_id>
 ```
 
 API equivalent:

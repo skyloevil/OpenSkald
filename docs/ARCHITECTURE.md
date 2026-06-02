@@ -142,7 +142,7 @@ docker compose up --build
 
 ### CLI
 ```bash
-uv run openviking-agent --config config/local.yaml validate-config
-uv run openviking-agent --config config/local.yaml generate-once \
+uv run OpenSkald --config config/local.yaml validate-config
+uv run OpenSkald --config config/local.yaml generate-once \
   --content-type daily_summary --platform x
 ```
