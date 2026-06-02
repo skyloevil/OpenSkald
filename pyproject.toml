@@ -22,7 +22,7 @@ dev = [
 ]
 
 [project.scripts]
-openviking-agent = "backend.app.cli:main"
+OpenSkald = "backend.app.cli:main"
 
 [tool.uv]
 package = false

@@ -12,7 +12,7 @@ from backend.app.ops.status import operational_status
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="openviking-agent")
+    parser = argparse.ArgumentParser(prog="OpenSkald")
     parser.add_argument(
         "--config",
         default=None,
