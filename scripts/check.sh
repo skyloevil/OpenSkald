@@ -65,7 +65,7 @@ else
   uv sync --extra dev
   PYTHON=(uv run python)
   RUFF=(uv run ruff)
-  CLI=(uv run OpenSkald)
+  CLI=(uv run python -m backend.app.cli)
 fi
 
 "${PYTHON[@]}" -m pytest
