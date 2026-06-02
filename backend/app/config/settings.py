@@ -74,13 +74,24 @@ REQUIRED_PUBLISHER_CREDENTIALS = {
 
 def validate_config(config: AppConfig) -> list[ConfigIssue]:
     issues: list[ConfigIssue] = []
-    if not config.openviking.knowledge_base_path.exists():
+    knowledge_base_path = config.openviking.knowledge_base_path
+    if knowledge_base_path == Path("."):
+        issues.append(
+            ConfigIssue(
+                level="error",
+                message=(
+                    "OpenViking knowledge base path cannot be empty or point to "
+                    "the current directory."
+                ),
+            )
+        )
+    elif not knowledge_base_path.exists():
         issues.append(
             ConfigIssue(
                 level="warning",
                 message=(
                     "OpenViking knowledge base path does not exist yet: "
-                    f"{config.openviking.knowledge_base_path}"
+                    f"{knowledge_base_path}"
                 ),
             )
         )
@@ -245,8 +256,12 @@ def config_summary(config: AppConfig, issues: list[ConfigIssue] | None = None) -
 
 
 def load_config(path: str | Path | None = None) -> AppConfig:
-    config_path = Path(path or os.getenv("OPENVIKING_AGENT_CONFIG", "config/config.yaml"))
+    env_path = os.getenv("OPENVIKING_AGENT_CONFIG")
+    specified_path = path if path is not None else env_path
+    config_path = Path(specified_path) if specified_path is not None else Path("config/config.yaml")
     if not config_path.exists():
+        if specified_path is not None:
+            raise FileNotFoundError(f"Configuration file not found: {config_path}")
         return AppConfig()
     with config_path.open("r", encoding="utf-8") as file:
         raw = yaml.safe_load(file) or {}
