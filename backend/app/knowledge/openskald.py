@@ -5,14 +5,14 @@ from pathlib import Path
 
 import yaml
 
-from backend.app.config.settings import OpenVikingConfig
+from backend.app.config.settings import OpenSkaldConfig
 from backend.app.domain.models import Article
 
 
-class OpenVikingKnowledgeBase:
-    """Reads technical articles from a local OpenViking-exported folder."""
+class OpenSkaldKnowledgeBase:
+    """Reads technical articles from a local OpenSkald-exported folder."""
 
-    def __init__(self, config: OpenVikingConfig) -> None:
+    def __init__(self, config: OpenSkaldConfig) -> None:
         self.config = config
 
     def recent_articles(self) -> list[Article]:

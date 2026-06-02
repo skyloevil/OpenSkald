@@ -24,8 +24,8 @@ def operational_status(container: AppContainer) -> dict:
             "jobs": scheduler_jobs,
         },
         "knowledge": {
-            "path": str(container.config.openviking.knowledge_base_path),
-            "path_exists": container.config.openviking.knowledge_base_path.exists(),
+            "path": str(container.config.openskald.knowledge_base_path),
+            "path_exists": container.config.openskald.knowledge_base_path.exists(),
             "indexed_articles": len(container.memory.list_articles()),
         },
         "memory": container.memory.operational_summary(),

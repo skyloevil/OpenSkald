@@ -36,7 +36,7 @@ environment: test
 llm:
   api_key_env: REAL_API_KEY
   model: test-model
-openviking:
+openskald:
   knowledge_base_path: {tmp_path}
 publishers:
   x:
@@ -62,7 +62,7 @@ environment: production
 llm:
   api_key_env: MISSING_KEY
   model: prod-model
-openviking:
+openskald:
   knowledge_base_path: {tmp_path}
 review:
   require_human_approval: false
@@ -85,7 +85,7 @@ environment: production
 llm:
   api_key_env: MISSING_KEY
   model: prod-model
-openviking:
+openskald:
   knowledge_base_path: {tmp_path}
 publishers:
   x:
@@ -115,7 +115,7 @@ environment: production
 llm:
   api_key_env: PROD_LLM_KEY
   model: prod-model
-openviking:
+openskald:
   knowledge_base_path: {tmp_path}
 publishers:
   x:
@@ -145,7 +145,7 @@ environment: production
 llm:
   api_key_env: PROD_LLM_KEY
   model: prod-model
-openviking:
+openskald:
   knowledge_base_path: {tmp_path}
 publishers:
   wechat:
@@ -171,7 +171,7 @@ environment: production
 llm:
   api_key_env: PROD_LLM_KEY
   model: prod-model
-openviking:
+openskald:
   knowledge_base_path: {tmp_path}
 publishers:
   blog:

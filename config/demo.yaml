@@ -8,7 +8,7 @@ llm:
   model: demo-local-deterministic
   timeout_seconds: 10
 
-openviking:
+openskald:
   knowledge_base_path: ./examples/knowledge
   include_globs:
     - "**/*.md"

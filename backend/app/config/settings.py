@@ -17,7 +17,7 @@ class LLMConfig(BaseModel):
     timeout_seconds: float = 60
 
 
-class OpenVikingConfig(BaseModel):
+class OpenSkaldConfig(BaseModel):
     knowledge_base_path: Path = Path("./knowledge")
     include_globs: list[str] = Field(default_factory=lambda: ["**/*.md", "**/*.txt"])
     max_articles_per_run: int = 10
@@ -53,7 +53,7 @@ class AppConfig(BaseModel):
     environment: Literal["development", "production", "test"] = "development"
     log_level: str = "INFO"
     llm: LLMConfig = Field(default_factory=LLMConfig)
-    openviking: OpenVikingConfig = Field(default_factory=OpenVikingConfig)
+    openskald: OpenSkaldConfig = Field(default_factory=OpenSkaldConfig)
     scheduler: dict[str, SchedulerJobConfig] = Field(default_factory=dict)
     publishers: dict[str, PublisherConfig] = Field(default_factory=dict)
     review: ReviewConfig = Field(default_factory=ReviewConfig)
@@ -74,13 +74,13 @@ REQUIRED_PUBLISHER_CREDENTIALS = {
 
 def validate_config(config: AppConfig) -> list[ConfigIssue]:
     issues: list[ConfigIssue] = []
-    if not config.openviking.knowledge_base_path.exists():
+    if not config.openskald.knowledge_base_path.exists():
         issues.append(
             ConfigIssue(
                 level="warning",
                 message=(
-                    "OpenViking knowledge base path does not exist yet: "
-                    f"{config.openviking.knowledge_base_path}"
+                    "OpenSkald knowledge base path does not exist yet: "
+                    f"{config.openskald.knowledge_base_path}"
                 ),
             )
         )
@@ -203,11 +203,11 @@ def config_summary(config: AppConfig, issues: list[ConfigIssue] | None = None) -
             "api_key_configured": config.llm.api_key_env in os.environ,
             "timeout_seconds": config.llm.timeout_seconds,
         },
-        "openviking": {
-            "knowledge_base_path": str(config.openviking.knowledge_base_path),
-            "knowledge_base_exists": config.openviking.knowledge_base_path.exists(),
-            "include_globs": config.openviking.include_globs,
-            "max_articles_per_run": config.openviking.max_articles_per_run,
+        "openskald": {
+            "knowledge_base_path": str(config.openskald.knowledge_base_path),
+            "knowledge_base_exists": config.openskald.knowledge_base_path.exists(),
+            "include_globs": config.openskald.include_globs,
+            "max_articles_per_run": config.openskald.max_articles_per_run,
         },
         "scheduler_jobs": {
             name: {
@@ -245,7 +245,7 @@ def config_summary(config: AppConfig, issues: list[ConfigIssue] | None = None) -
 
 
 def load_config(path: str | Path | None = None) -> AppConfig:
-    config_path = Path(path or os.getenv("OPENVIKING_AGENT_CONFIG", "config/config.yaml"))
+    config_path = Path(path or os.getenv("OPENSKALD_AGENT_CONFIG", "config/config.yaml"))
     if not config_path.exists():
         return AppConfig()
     with config_path.open("r", encoding="utf-8") as file:

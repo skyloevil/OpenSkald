@@ -2,15 +2,15 @@
 
 ## Overview
 
-OpenViking Content Agent is a self-hosted AI content automation platform. It reads
-technical articles from a local OpenViking knowledge base, generates reviewable content,
+OpenSkald Content Agent is a self-hosted AI content automation platform. It reads
+technical articles from a local OpenSkald knowledge base, generates reviewable content,
 and publishes through platform plugins.
 
 ## Architecture Diagram
 
 ```mermaid
 flowchart LR
-  KB["OpenViking knowledge base"] --> K["Knowledge adapter"]
+  KB["OpenSkald knowledge base"] --> K["Knowledge adapter"]
   K --> A["Content agent"]
   C["config.yaml"] --> A
   S["Dynamic skills"] --> A
@@ -32,7 +32,7 @@ backend/
     api/          FastAPI routes (build_router)
     config/       config.yaml loading and validation (Pydantic models)
     domain/       Core models (Article, GeneratedContent, etc.)
-    knowledge/    OpenViking adapter (reads local markdown files)
+    knowledge/    OpenSkald adapter (reads local markdown files)
     llm/          LLMProvider interface (OpenAI-compatible + Demo)
     memory/       JSONL-based MemoryStore
     publishers/   Publisher plugins (wechat, x, xiaohongshu)
@@ -42,7 +42,7 @@ config/           Configuration files
 tests/            pytest test suite
 data/             Runtime data (memory, review queue, skill proposals)
 docs/             Documentation
-knowledge/        OpenViking knowledge base mount point
+knowledge/        OpenSkald knowledge base mount point
 ```
 
 ## Layers
@@ -61,7 +61,7 @@ Abstract `LLMProvider` interface with two implementations:
 - `DemoLLMProvider` — deterministic local mode for testing without API keys
 
 ### Knowledge Layer (`knowledge/`)
-`OpenVikingKnowledgeBase` reads markdown files from a local directory. Supports
+`OpenSkaldKnowledgeBase` reads markdown files from a local directory. Supports
 YAML frontmatter for title, tags, and URL. Returns `Article` objects sorted by
 modification time.
 
@@ -132,7 +132,7 @@ See `config/demo.yaml` for a no-credentials demo configuration.
 ```bash
 uv sync --extra dev
 cp config/config.yaml config/local.yaml
-OPENVIKING_AGENT_CONFIG=config/local.yaml uv run uvicorn backend.app.main:app --reload
+OPENSKALD_AGENT_CONFIG=config/local.yaml uv run uvicorn backend.app.main:app --reload
 ```
 
 ### Docker
@@ -142,7 +142,7 @@ docker compose up --build
 
 ### CLI
 ```bash
-uv run openviking-agent --config config/local.yaml validate-config
-uv run openviking-agent --config config/local.yaml generate-once \
+uv run openskald --config config/local.yaml validate-config
+uv run openskald --config config/local.yaml generate-once \
   --content-type daily_summary --platform x
 ```

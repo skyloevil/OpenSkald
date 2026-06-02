@@ -20,7 +20,7 @@ llm:
   base_url: http://localhost:3456/v1
   api_key_env: TEST_SECRET_KEY
   model: smoke-model
-openviking:
+openskald:
   knowledge_base_path: {knowledge_path}
 publishers:
   x:

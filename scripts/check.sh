@@ -15,7 +15,7 @@ llm:
   provider: demo
   model: demo-local-deterministic
 
-openviking:
+openskald:
   knowledge_base_path: examples/knowledge
   include_globs:
     - "**/*.md"
@@ -65,7 +65,7 @@ else
   uv sync --extra dev
   PYTHON=(uv run python)
   RUFF=(uv run ruff)
-  CLI=(uv run openviking-agent)
+  CLI=(uv run openskald)
 fi
 
 "${PYTHON[@]}" -m pytest

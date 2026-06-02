@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve OpenViking Content Agent.
+Thanks for helping improve OpenSkald Content Agent.
 
 ## Local Setup
 
