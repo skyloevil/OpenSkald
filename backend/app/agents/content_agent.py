@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from backend.app.domain.models import ContentType, GeneratedContent, SkillProposal
+from backend.app.domain.models import ContentType, GeneratedContent, MemoryRecord, SkillProposal
 from backend.app.knowledge.openviking import OpenVikingKnowledgeBase
 from backend.app.llm.provider import LLMProvider
 from backend.app.memory.store import MemoryStore
@@ -25,6 +25,8 @@ class ContentAgent:
         content_type: ContentType,
         platforms: list[str],
     ) -> list[GeneratedContent]:
+        import time
+        start = time.monotonic()
         articles = self.memory.list_articles()
         article_source = "index"
         if not articles:
@@ -33,10 +35,15 @@ class ContentAgent:
         if not articles:
             raise ValueError("No OpenViking articles available for generation")
         generated: list[GeneratedContent] = []
+        errors: list[str] = []
         for platform in platforms:
             skills = self.skills.for_content(content_type, platform)
             for skill in skills:
-                body = await skill.run(articles, self.llm)
+                try:
+                    body = await skill.run(articles, self.llm)
+                except Exception as exc:
+                    errors.append(f"{platform}/{skill.metadata.name}: {exc}")
+                    continue
                 item = GeneratedContent(
                     content_type=content_type,
                     platform=platform,
@@ -50,6 +57,39 @@ class ContentAgent:
                 )
                 self.memory.remember_content(item)
                 generated.append(item)
+        duration_ms = int((time.monotonic() - start) * 1000)
+        # Record experience
+        self.memory.append_memory_record(
+            MemoryRecord(
+                namespace="viking://agent/experience",
+                kind="experience",
+                payload={
+                    "action": "generate",
+                    "result": "partial" if errors else "success",
+                    "content_type": content_type.value,
+                    "platforms": platforms,
+                    "article_source": article_source,
+                    "article_count": len(articles),
+                    "generated_count": len(generated),
+                    "duration_ms": duration_ms,
+                },
+                source="ContentAgent.generate",
+            )
+        )
+        if errors:
+            self.memory.append_memory_record(
+                MemoryRecord(
+                    namespace="viking://agent/experience",
+                    kind="experience",
+                    payload={
+                        "action": "generate",
+                        "result": "failure",
+                        "errors": errors,
+                    },
+                    source="ContentAgent.generate",
+                    confidence=0.8,
+                )
+            )
         return generated
 
     def propose_skill(
