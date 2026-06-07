@@ -139,6 +139,13 @@ class MultiAgentOrchestrator:
                     errors.append(
                         f"ReviewAgent failed for {draft.platform}: {exc}"
                     )
+                    review_reports.append(
+                        ReviewReport(
+                            approved=False,
+                            notes=f"Review failed: {exc}",
+                            factual_issues=[str(exc)],
+                        )
+                    )
 
             # One round of revision if review failed
             if (
@@ -147,16 +154,12 @@ class MultiAgentOrchestrator:
             ):
                 turn_count += 1
                 for idx, (draft, report) in enumerate(
-                    zip(drafts, review_reports, strict=False)
+                    zip(drafts, review_reports, strict=True)
                 ):
                     if not report.approved:
                         fixed_body = draft.body
                         if "280 character" in str(report.platform_issues):
-                            fixed_body = "\n".join(
-                                line
-                                for line in draft.body.split("\n")
-                                if len(line) <= 260
-                            )[:260]
+                            fixed_body = draft.body[:260]
                         if fixed_body != draft.body:
                             drafts[idx] = PlatformDraft(
                                 platform=draft.platform,

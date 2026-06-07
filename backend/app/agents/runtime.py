@@ -124,7 +124,11 @@ class OpenSkaldAgentRuntime:
                 kind="experience",
                 payload={
                     "action": "agent_run",
-                    "result": "success" if not errors else "partial" if errors else "failure",
+                    "result": (
+                        "failure"
+                        if run.status == AgentRunStatus.FAILED
+                        else "partial" if errors else "success"
+                    ),
                     "mode": mode.value,
                     "content_type": content_type.value,
                     "platforms": platforms,
@@ -171,46 +175,38 @@ class OpenSkaldAgentRuntime:
             f.write(json.dumps(run.model_dump(mode="json"), ensure_ascii=False) + "\n")
 
     def _update_agent_run(self, run: AgentRun) -> None:
-
+        import json
         records_path = self.memory.memory.path.parent / "memory_records.jsonl"
-        runs = []
-        if records_path.exists():
-            with records_path.open("r", encoding="utf-8") as f:
-                for line in f:
-                    if line.strip():
-                        row = __import__("json").loads(line)
-                        runs.append(row)
-        # Remove existing run with same id
-        runs = [r for r in runs if r.get("id") != run.id]
-        runs.append(run.model_dump(mode="json"))
-        with records_path.open("w", encoding="utf-8") as f:
-            for row in runs:
-                f.write(__import__("json").dumps(row, ensure_ascii=False) + "\n")
+        records_path.parent.mkdir(parents=True, exist_ok=True)
+        with records_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(run.model_dump(mode="json"), ensure_ascii=False) + "\n")
 
     def get_run(self, run_id: str) -> dict | None:
         """Retrieve a stored agent run."""
         records_path = self.memory.memory.path.parent / "memory_records.jsonl"
         if not records_path.exists():
             return None
+        latest_run = None
         with records_path.open("r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
                     row = __import__("json").loads(line)
                     if row.get("id") == run_id and "latency_ms" in row:
-                        return row
-        return None
+                        latest_run = row
+        return latest_run
 
     def list_runs(self, limit: int = 20) -> list[dict]:
         """List recent agent runs."""
         records_path = self.memory.memory.path.parent / "memory_records.jsonl"
         if not records_path.exists():
             return []
-        runs = []
+        runs_dict = {}
         with records_path.open("r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
                     row = __import__("json").loads(line)
                     if "latency_ms" in row:
-                        runs.append(row)
+                        runs_dict[row["id"]] = row
+        runs = list(runs_dict.values())
         runs.sort(key=lambda r: r.get("created_at", ""), reverse=True)
         return runs[:limit]

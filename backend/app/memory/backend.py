@@ -103,7 +103,7 @@ class OpenVikingMemoryBackend(MemoryBackend):
             self.local_fallback.append(record)
         except Exception:
             self._degraded = True
-            self.local_fallback.append(record)
+            raise
 
     def search(
         self, namespace: str, kind: str | None = None, limit: int = 20

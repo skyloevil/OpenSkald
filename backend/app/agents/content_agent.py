@@ -59,37 +59,27 @@ class ContentAgent:
                 generated.append(item)
         duration_ms = int((time.monotonic() - start) * 1000)
         # Record experience
+        result = "success"
+        if errors:
+            result = "failure" if len(generated) == 0 else "partial"
         self.memory.append_memory_record(
             MemoryRecord(
                 namespace="viking://agent/experience",
                 kind="experience",
                 payload={
                     "action": "generate",
-                    "result": "partial" if errors else "success",
+                    "result": result,
                     "content_type": content_type.value,
                     "platforms": platforms,
                     "article_source": article_source,
                     "article_count": len(articles),
                     "generated_count": len(generated),
                     "duration_ms": duration_ms,
+                    "errors": errors,
                 },
                 source="ContentAgent.generate",
             )
         )
-        if errors:
-            self.memory.append_memory_record(
-                MemoryRecord(
-                    namespace="viking://agent/experience",
-                    kind="experience",
-                    payload={
-                        "action": "generate",
-                        "result": "failure",
-                        "errors": errors,
-                    },
-                    source="ContentAgent.generate",
-                    confidence=0.8,
-                )
-            )
         return generated
 
     def propose_skill(

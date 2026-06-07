@@ -243,9 +243,12 @@ class MemoryStore:
 
     def append_memory_record(self, record: MemoryRecord) -> None:
         """Append a namespaced memory record for later retrieval."""
-        records = self._read_memory_records()
-        records.append(record.model_dump(mode="json"))
-        self._write_memory_records(records)
+        import json
+
+        records_path = self.memory.path.parent / "memory_records.jsonl"
+        records_path.parent.mkdir(parents=True, exist_ok=True)
+        with records_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record.model_dump(mode="json"), ensure_ascii=False) + "\n")
         return record
 
     def search_namespace(

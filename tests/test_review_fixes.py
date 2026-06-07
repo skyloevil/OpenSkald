@@ -5,12 +5,60 @@ from pathlib import Path
 from backend.app import cli
 from backend.app.agents.skill_evolution_agent import SkillEvolutionAgent
 from backend.app.domain.models import (
+    Article,
     ContentType,
     MemoryRecord,
     ReviewStatus,
     SkillProposal,
 )
 from backend.app.memory.store import MemoryStore
+
+
+def test_content_agent_records_single_consolidated_failed_experience(tmp_path: Path) -> None:
+    import asyncio
+    from types import SimpleNamespace
+
+    from backend.app.agents.content_agent import ContentAgent
+    from backend.app.config.settings import OpenVikingConfig
+    from backend.app.knowledge.openviking import OpenVikingKnowledgeBase
+    from backend.app.llm.provider import DemoLLMProvider
+
+    class FailingSkill:
+        metadata = SimpleNamespace(name="failing_skill")
+
+        async def run(self, articles, llm):
+            raise RuntimeError("model unavailable")
+
+    class FailingSkillRegistry:
+        def for_content(self, content_type, platform):
+            return [FailingSkill()]
+
+    knowledge = tmp_path / "knowledge"
+    knowledge.mkdir()
+    memory = MemoryStore(tmp_path / "memory.jsonl", tmp_path / "skill_proposals.jsonl")
+    memory.remember_article(
+        Article(id="article-1", title="Agent Memory", content="Memory matters.")
+    )
+    agent = ContentAgent(
+        OpenVikingKnowledgeBase(OpenVikingConfig(knowledge_base_path=knowledge)),
+        FailingSkillRegistry(),
+        DemoLLMProvider(),
+        memory,
+    )
+
+    generated = asyncio.run(agent.generate(ContentType.DAILY_SUMMARY, ["x"]))
+
+    assert generated == []
+    experiences = memory.list_experiences()
+    generate_experiences = [
+        item for item in experiences if item.payload.get("action") == "generate"
+    ]
+    assert len(generate_experiences) == 1
+    assert generate_experiences[0].payload["result"] == "failure"
+    assert generate_experiences[0].payload["generated_count"] == 0
+    assert generate_experiences[0].payload["errors"] == [
+        "x/failing_skill: model unavailable"
+    ]
 
 
 def test_cli_review_approve_records_experience(tmp_path: Path, capsys) -> None:

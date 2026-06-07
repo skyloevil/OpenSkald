@@ -120,3 +120,103 @@ async def test_orchestrator_with_review_failure(tmp_path: Path) -> None:
     # Review should fail and generate errors, but workflow continues
     assert len(result.errors) > 0
     assert any("Review failed" in e for e in result.errors)
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_review_exception_keeps_reports_aligned(tmp_path: Path) -> None:
+    memory = MemoryStore(tmp_path / "memory.jsonl", tmp_path / "skill_proposals.jsonl")
+    skills = SkillRegistry(Path("backend/app/skills"))
+    skills.load()
+    llm = DemoLLMProvider()
+
+    knowledge_path = tmp_path / "knowledge"
+    knowledge_path.mkdir()
+    (knowledge_path / "t.md").write_text("---\ntitle: T\n---\nContent.\n", encoding="utf-8")
+
+    class RaisingReviewAgent(ReviewAgent):
+        async def review(self, draft: PlatformDraft) -> ReviewReport:
+            raise RuntimeError(f"cannot review {draft.platform}")
+
+    orchestrator = MultiAgentOrchestrator(
+        research_agent=ResearchAgent(
+            OpenVikingKnowledgeBase(OpenVikingConfig(knowledge_base_path=knowledge_path)),
+            memory,
+        ),
+        writing_agent=WritingAgent(skills, llm),
+        review_agent=RaisingReviewAgent(memory),
+        publishing_agent=PublishingAgent(memory, PublisherRegistry({})),
+        reflection_agent=ReflectionAgent(memory, llm),
+        growth_agent=GrowthAgent(memory),
+        memory=memory,
+    )
+
+    result = await orchestrator.run(
+        objective="Test review exception",
+        content_type=ContentType.DAILY_SUMMARY,
+        platforms=["blog"],
+        max_turns=8,
+        require_review=True,
+    )
+
+    assert any("ReviewAgent failed for blog" in error for error in result.errors)
+    assert any(artifact["type"] == "stored_content" for artifact in result.artifacts)
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_x_revision_truncates_without_emptying_body(tmp_path: Path) -> None:
+    memory = MemoryStore(tmp_path / "memory.jsonl", tmp_path / "skill_proposals.jsonl")
+    skills = SkillRegistry(Path("backend/app/skills"))
+    skills.load()
+    llm = DemoLLMProvider()
+
+    knowledge_path = tmp_path / "knowledge"
+    knowledge_path.mkdir()
+    (knowledge_path / "t.md").write_text("---\ntitle: T\n---\nContent.\n", encoding="utf-8")
+
+    class LongWritingAgent(WritingAgent):
+        async def write(
+            self, brief, content_type: ContentType, platforms: list[str]
+        ) -> list[PlatformDraft]:
+            return [
+                PlatformDraft(
+                    platform="x",
+                    title="Long X",
+                    body="x" * 400,
+                    content_type=content_type,
+                )
+            ]
+
+    class RejectingReviewAgent(ReviewAgent):
+        async def review(self, draft: PlatformDraft) -> ReviewReport:
+            return ReviewReport(
+                approved=False,
+                platform_issues=["X posts exceed 280 character limit"],
+                revision_suggestions="Shorten content",
+            )
+
+    orchestrator = MultiAgentOrchestrator(
+        research_agent=ResearchAgent(
+            OpenVikingKnowledgeBase(OpenVikingConfig(knowledge_base_path=knowledge_path)),
+            memory,
+        ),
+        writing_agent=LongWritingAgent(skills, llm),
+        review_agent=RejectingReviewAgent(memory),
+        publishing_agent=PublishingAgent(memory, PublisherRegistry({})),
+        reflection_agent=ReflectionAgent(memory, llm),
+        growth_agent=GrowthAgent(memory),
+        memory=memory,
+    )
+
+    result = await orchestrator.run(
+        objective="Test X revision",
+        content_type=ContentType.DAILY_SUMMARY,
+        platforms=["x"],
+        max_turns=8,
+        require_review=True,
+    )
+
+    revised = [artifact for artifact in result.artifacts if artifact["type"] == "revised_draft"]
+    assert revised
+    body = revised[0]["data"]["body"]
+    assert body
+    assert len(body) == 260

@@ -20,16 +20,16 @@ class WritingAgent:
         self, brief: SourceBrief, content_type: ContentType, platforms: list[str]
     ) -> list[PlatformDraft]:
         """Generate drafts for each platform based on the source brief."""
+        from backend.app.domain.models import Article
+
         drafts: list[PlatformDraft] = []
         articles_data = brief.articles
+        articles = [Article.model_validate(a) for a in articles_data]
 
         for platform in platforms:
             skills = self.skills.for_content(content_type, platform)
             for skill in skills:
-                # Convert dict articles back to Article objects for the skill
-                from backend.app.domain.models import Article
-
-                articles = [Article.model_validate(a) for a in articles_data]
+                # Use pre-validated Article objects.
                 try:
                     body = await skill.run(articles, self.llm)
                 except Exception as exc:

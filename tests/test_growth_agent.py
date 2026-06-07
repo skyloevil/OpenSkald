@@ -56,6 +56,38 @@ async def test_growth_agent_analyze_from_failures(tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
+async def test_growth_agent_evidence_ids_match_failed_action(tmp_path: Path) -> None:
+    memory = MemoryStore(tmp_path / "memory.jsonl", tmp_path / "skill_proposals.jsonl")
+    agent = GrowthAgent(memory)
+
+    publish_ids = []
+    for i in range(2):
+        record = MemoryRecord(
+            namespace="viking://agent/experience",
+            kind="experience",
+            payload={"action": "publish", "result": "failure", "errors": [f"p{i}"]},
+            source="test",
+        )
+        publish_ids.append(record.id)
+        memory.append_memory_record(record)
+    generate_record = MemoryRecord(
+        namespace="viking://agent/experience",
+        kind="experience",
+        payload={"action": "generate", "result": "failure", "errors": ["g0"]},
+        source="test",
+    )
+    memory.append_memory_record(generate_record)
+
+    signals = await agent.analyze()
+
+    publish_signal = next(
+        signal for signal in signals if "Action 'publish'" in signal.observation
+    )
+    assert set(publish_signal.evidence_ids) == set(publish_ids)
+    assert generate_record.id not in publish_signal.evidence_ids
+
+
+@pytest.mark.asyncio
 async def test_growth_agent_analyze_empty_no_signals(tmp_path: Path) -> None:
     memory = MemoryStore(tmp_path / "memory.jsonl", tmp_path / "skill_proposals.jsonl")
     agent = GrowthAgent(memory)

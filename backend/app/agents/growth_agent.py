@@ -19,7 +19,6 @@ class GrowthAgent:
 
     async def analyze(self) -> list[AgentReflection]:
         """Analyze metrics and recent reflections to generate growth signals."""
-        _ = self.memory.list_reflections(limit=20)
         experiences = self.memory.list_experiences(limit=20)
         content = self.memory.list_content()
         signals: list[AgentReflection] = []
@@ -48,8 +47,12 @@ class GrowthAgent:
                         "the error handling in the relevant agent."
                     ),
                     confidence=min(0.5 + count * 0.1, 0.9),
-                    evidence_ids=[e.id for e in experiences
-                    if e.payload.get("result") == "failure"],
+                    evidence_ids=[
+                        e.id
+                        for e in experiences
+                        if e.payload.get("result") == "failure"
+                        and e.payload.get("action") == action
+                    ],
                 )
                 self._store_reflection(ref)
                 signals.append(ref)

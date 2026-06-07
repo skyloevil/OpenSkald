@@ -18,10 +18,12 @@ class ResearchAgent:
 
     async def research(self, objective: str) -> SourceBrief:
         """Return a curated set of source material for a given objective."""
-        # Gather articles from both sources
-        articles = self.memory.list_articles()
+        # Gather articles from both sources, preferably relevant to the objective.
+        articles = self.memory.search_articles(objective, limit=10)
         if not articles:
-            articles = self.knowledge_base.recent_articles()
+            articles = self.memory.list_articles()[:10]
+        if not articles:
+            articles = self.knowledge_base.recent_articles()[:10]
 
         # Gather relevant memory records
         memory_records = self.memory.search_namespace(
