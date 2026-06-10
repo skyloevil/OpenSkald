@@ -116,7 +116,7 @@ curl -X POST http://localhost:8000/api/knowledge/ingest
 ```
 
 响应示例：
-
+本文档提供了 OpenSkald 的完整 API 参考。
 ```json
 {
   "ingested": 2
